@@ -1,7 +1,9 @@
+import google.generativeai as genai
+import glob
+import os
+
 from PyPDF2 import PdfReader
 from io import StringIO
-
-import google.generativeai as genai
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -15,6 +17,16 @@ import streamlit as st
 
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 dl_dir = 'transcripts/'
+
+
+def read_file_transcripts_folder(category: str):
+    st.success(category)
+    raw_text = ""
+    for file in glob.glob(dl_dir + "/*.txt"):
+        my_file = open(file)
+        raw_text += my_file.read()
+    text_chunks = get_text_chunks(raw_text)
+    get_vector_store(text_chunks)
 
 
 def get_pdf_text(pdf_docs):
@@ -83,26 +95,23 @@ def main():
         page_icon="🤖"
     )
 
-    # Sidebar for uploading PDF files
-    with st.sidebar:
-        st.title("Menu:")
-        txt_file = st.file_uploader(
-            "Upload your file(s) and Click on the Submit & Process Button", accept_multiple_files=False)
-        if st.button("ประมวลผล!"):
-            with st.spinner("Processing..."):
-                # raw_text = get_pdf_text(pdf_docs) # Replace with getting raw string from text file
-                stringio = StringIO(txt_file.getvalue().decode("utf-8"))
-                raw_text = stringio.read()
+    read_file_transcripts_folder('Default')
 
-                # raw_text = ""
-                # for file in glob.glob(dl_dir + "/*.txt"):
-                #     print(file)
-                #
-                #     my_file = open(file)
-                #     raw_text += my_file.read()
-                text_chunks = get_text_chunks(raw_text)
-                get_vector_store(text_chunks)
-                st.success("Done")
+    # Sidebar
+    with st.sidebar:
+        # Define the menu options
+        menu_options = ["Home", "Upload PDF", "Process Data", "About"]
+        # Create a selectbox for the menu
+        menu_selection = st.selectbox("Category", menu_options)
+        # Display different content based on the menu selection
+        if menu_selection == "Home":
+            read_file_transcripts_folder('Home')
+        elif menu_selection == "Upload PDF":
+            read_file_transcripts_folder('Upload PDF')
+        elif menu_selection == "Process Data":
+            read_file_transcripts_folder('Process Data')
+        elif menu_selection == "About":
+            read_file_transcripts_folder('About')
 
     # Main content area for displaying chat messages
     st.title("ConicleAI Chatbot")
