@@ -2,5 +2,6 @@
 /shelf/
 /workspace.xml
 .idea
+.streamlit
 faiss_index/*.pkl
 faiss_index/*.faiss
