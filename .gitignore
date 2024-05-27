@@ -3,3 +3,5 @@
 /workspace.xml
 .idea
 .streamlit
+faiss_index/index.faiss
+faiss_index/index.pkl
